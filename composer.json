@@ -13,15 +13,14 @@
     ],
 
     "require": {
-        "php": ">=7.0 || <=7.3",
-        "symfony/var-dumper": "^4.0",
-        "symfony/yaml": "^4.2"
+        "php": ">=7.0 || <=7.3"
     },
 
     "require-dev": {
         "fzaninotto/faker": "^1.7",
         "phpunit/phpunit": "^7",
-        "kint-php/kint": "^3.2"
+        "kint-php/kint": "^3.2",
+        "symfony/var-dumper": "^4.2"
     },
 
     "autoload": {
