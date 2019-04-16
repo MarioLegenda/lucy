@@ -1,0 +1,143 @@
+configuration:
+    connection:
+        host: 127.0.0.1
+        user: 'root'
+        password: 'root'
+        database_name: ''
+
+    sql_import: 'import/import.yml'
+
+    simple:
+        select:
+            find_all_users:
+                sql: select.find_all_users
+
+            by_column_filter_find_all_users:
+                sql: select.find_all_users
+                filter:
+                    by_column: id
+
+            find_exact_filter_find_all_users:
+                sql: select.find_all_users
+                filter:
+                    find: [id, 1]
+
+            normalize_if_one_exists_filter_find_all_users:
+                sql: 'SELECT * FROM user WHERE id = 1'
+                filter:
+                    normalize_if_one_exists: true
+
+            cascading_filter_find_all_users:
+                sql: select.find_all_users
+                filter:
+                    find: [id, 1]
+                    normalize_if_one_exists: true
+
+            normalize_joined_result_find_all_users:
+                sql: select.find_all_users
+                filter:
+                    normalize_joined_result:
+                        linking_column: 'id'
+                        columns: ['username']
+                    find: [id, 7]
+                    normalize_if_one_exists: true
+
+            find_user_by_id_with_object_return:
+                sql: 'SELECT * FROM user WHERE id = :id'
+                parameters: [id]
+                model:
+                    object: Test\Model\User
+            find_user_by_id:
+                sql: 'SELECT * FROM user WHERE id = :id'
+                parameters: [id]
+        delete:
+            delete_all_users:
+                sql: 'DELETE FROM user'
+            delete_user_by_id:
+                sql: 'DELETE FROM user WHERE id = :id'
+                parameters: [id]
+        update:
+            update_all_users:
+                sql: 'UPDATE user SET username = :username'
+                parameters: [username]
+                filter:
+                    find: [id, 1]
+                    normalize_if_one_exists: true
+            update_user_by_id:
+                sql: 'UPDATE user SET username = :username WHERE id = :id'
+                parameters: [username, id]
+        insert:
+            insert_user:
+                sql: 'INSERT INTO user (name, lastname, username) VALUES (:name, :lastname, :username)'
+                parameters: [name, lastname, username]
+
+    scenario:
+        table_creation:
+            atomic: false
+            statements:
+                create_database:
+                    sql: "CREATE DATABASE IF NOT EXISTS blue_dot"
+                use_database:
+                    sql: "USE blue_dot"
+                create_user_table:
+                    sql: "CREATE TABLE IF NOT EXISTS user (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255) NOT NULL, lastname VARCHAR(255) NOT NULL, username VARCHAR(255) NOT NULL)"
+                create_address_table:
+                    sql: "CREATE TABLE IF NOT EXISTS addresses (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT NOT NULL, address VARCHAR(255) NOT NULL)"
+                create_normalized_user:
+                    sql: "CREATE TABLE IF NOT EXISTS normalized_user (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT NOT NULL, address_id INT NOT NULL)"
+
+        select_user_by_id:
+            atomic: true
+            statements:
+                find_user_by_id:
+                    sql: 'SELECT * FROM user WHERE id = :id'
+                    parameters: [id]
+
+        insert_user:
+            atomic: true
+            statements:
+                insert_user:
+                    sql: "INSERT INTO user (username, name, lastname) VALUES (:username, :name, :lastname)"
+                    parameters: [username, name, lastname]
+                insert_address:
+                    sql: "INSERT INTO addresses (user_id, address) VALUES (:user_id, :address)"
+                    parameters: [address]
+                    foreign_key:
+                        statement_names: [insert_user]
+                        bind_them_to: [user_id]
+
+        select_user:
+            atomic: true
+            statements:
+                select_user:
+                    sql: select.find_all_users
+                    filter:
+                        find: [id, 1]
+                        normalize_if_one_exists: true
+
+        invalid_filter_insert_user:
+            atomic: true
+            statements:
+                insert_user:
+                    sql: "INSERT INTO user (username, name, lastname) VALUES (:username, :name, :lastname)"
+                    parameters: [username, name, lastname]
+                    filter:
+                        normalize_if_one_exists: true
+
+        normalized_user_insert:
+            atomic: true
+            statements:
+                insert_user:
+                    sql: "INSERT INTO user (username, name, lastname) VALUES (:username, :name, :lastname)"
+                    parameters: [username, name, lastname]
+                insert_address:
+                    sql: "INSERT INTO addresses (user_id, address) VALUES (:user_id, :address)"
+                    parameters: [address]
+                    foreign_key:
+                        statement_names: [insert_user]
+                        bind_them_to: [user_id]
+                create_normalized_user:
+                    sql: "INSERT INTO normalized_user (user_id, address_id) VALUES (:user_id, :address_id)"
+                    foreign_key:
+                        statement_names: [insert_user, insert_address]
+                        bind_them_to: [user_id, address_id]
