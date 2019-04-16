@@ -1,0 +1,33 @@
+{
+    "name": "mario-legenda/lucy",
+    "description": "Lightweight PHP yaml config parser",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["yaml", "php"],
+    "authors": [
+        {
+            "name": "Mario Skrlec",
+            "email": "whitepostmail@gmail.com",
+            "role": "Developer"
+        }
+    ],
+
+    "require": {
+        "php": ">=7.0 || <=7.3",
+        "symfony/var-dumper": "^4.0",
+        "symfony/yaml": "^4.2"
+    },
+
+    "require-dev": {
+        "fzaninotto/faker": "^1.7",
+        "phpunit/phpunit": "^7",
+        "kint-php/kint": "^3.2"
+    },
+
+    "autoload": {
+        "psr-0": {
+            "Lucy": "src/",
+            "Test": "tests/"
+        }
+    }
+}
