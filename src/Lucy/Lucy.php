@@ -3,6 +3,7 @@
 namespace Lucy;
 
 use Lucy\Exception\ConfigurationException;
+use Lucy\Validator\Validator;
 
 class Lucy implements \IteratorAggregate, \Countable
 {
@@ -22,6 +23,10 @@ class Lucy implements \IteratorAggregate, \Countable
      * @var array $workingNode
      */
     private $workingNode;
+    /**
+     * @var Validator $validator
+     */
+    private $validator;
     /**
      * ArrayNode constructor.
      * @param string $rootNode
@@ -66,6 +71,7 @@ class Lucy implements \IteratorAggregate, \Countable
         }
 
         $this->workingNode = $workingNode;
+        $this->validator = Validator::create();
 
         if ($parentNode instanceof Lucy) {
             $this->parentNode = $parentNode;
@@ -82,6 +88,7 @@ class Lucy implements \IteratorAggregate, \Countable
     }
     /**
      * @param string $nodeName
+     * @param string|null $errorMessage
      * @return $this|Lucy
      * @throws ConfigurationException
      *
@@ -99,11 +106,15 @@ class Lucy implements \IteratorAggregate, \Countable
      *
      * If the $nodeName does not exist, throws a ConfigurationException
      */
-    public function stepInto(string $nodeName) : Lucy
+    public function stepInto(string $nodeName, string $errorMessage = null) : Lucy
     {
         if (!empty($this->workingNode)) {
             if (!array_key_exists($nodeName, $this->workingNode)) {
-                throw new ConfigurationException('\''.$nodeName.'\' not found and cannot step into');
+                if ($errorMessage) {
+                    throw new ConfigurationException($errorMessage);
+                }
+
+                throw new ConfigurationException("Cannot step into '$nodeName'. '$nodeName' does not exist");
             }
 
             return new Lucy(
@@ -113,7 +124,7 @@ class Lucy implements \IteratorAggregate, \Countable
             );
         }
 
-        throw new ConfigurationException('\''.$nodeName.'\' not found and cannot step into');
+        throw new ConfigurationException("Cannot step into '$nodeName'. '$nodeName' does not exist");
     }
     /**
      * @param string $nodeName
@@ -162,14 +173,23 @@ class Lucy implements \IteratorAggregate, \Countable
 
         if ($this->conditionalIgnore === false) {
             if (!$this->parentNode instanceof Lucy) {
-                throw new ConfigurationException('Nowhere to step out to');
+                $message = sprintf(
+                    'Cannot step out of \'%s\' because this node does not have a parent',
+                    $this->getNodeName()
+                );
+
+                throw new ConfigurationException($message);
             }
 
             $parent = $this->getParent();
 
             if (!$parent instanceof Lucy) {
-                throw new ConfigurationException('Nowhere to step out to');
-            }
+                $message = sprintf(
+                    'Cannot step out of \'%s\' because this node does not have a parent',
+                    $this->getNodeName()
+                );
+
+                throw new ConfigurationException($message);            }
 
             return $parent;
         }
@@ -234,7 +254,7 @@ class Lucy implements \IteratorAggregate, \Countable
     }
     /**
      * @param string $nodeName
-     * @param array $node
+     * @param string|null $errorMessage
      * @return Lucy
      * @throws ConfigurationException
      *
@@ -248,36 +268,22 @@ class Lucy implements \IteratorAggregate, \Countable
      * If the conditional ignore is set to true, this method throw an exception if the $nodeName does
      * not exist
      */
-    public function keyExists(string $nodeName, array $node = []) : Lucy
+    public function keyHasToExist(string $nodeName, string $errorMessage = null) : Lucy
     {
         if ($this->conditionalIgnore === false) {
-            if (!empty($node)) {
-                return $this->internalKeyExists($nodeName, $node);
-            }
-
-            return $this->internalKeyExists($nodeName, $this->workingNode);
+            $this->validator->keyHasToExist()->validate(
+                $nodeName,
+                $this->workingNode,
+                $this->parentNode,
+                $errorMessage
+            );
         }
 
         return $this;
     }
     /**
      * @param string $nodeName
-     * @param array $node
-     * @return Lucy
-     * @throws ConfigurationException
-     *
-     * Does the same as Lucy::keyExists() but it throws an exception if the $nodeName does not exist
-     */
-    public function mandatoryKeyExists(string $nodeName, array $node = []): Lucy
-    {
-        if (!empty($node)) {
-            return $this->internalKeyExists($nodeName, $node);
-        }
-
-        return $this->internalKeyExists($nodeName, $this->workingNode);
-    }
-    /**
-     * @param string $nodeName
+     * @param string|null $errorMessage
      * @return $this
      * @throws ConfigurationException
      *
@@ -290,32 +296,28 @@ class Lucy implements \IteratorAggregate, \Countable
      * If a call to Lucy::stepIntoIfExists() and there was a node to be stepped into, then this
      * node will not throw an exception. Otherwise, it throws an exception
      */
-    public function cannotBeEmpty(string $nodeName) : Lucy
+    public function cannotBeEmpty(string $nodeName, string $errorMessage = null) : Lucy
     {
         if ($this->conditionalIgnore === false) {
-            if (!array_key_exists($nodeName, $this->workingNode)) {
-                throw new ConfigurationException('Node \''.$nodeName.'\' does not exist and and cannot be empty for parent node \''.$this->getNodeName().'\'');
-            }
-
-            if (is_bool($this->workingNode[$nodeName])) {
-                return $this;
-            }
-
-            if (empty($this->workingNode[$nodeName])) {
-                throw new ConfigurationException('Node \''.$nodeName.'\' cannot be empty for parent node \''.$this->getNodeName().'\'');
-            }
+            $this->validator->cannotBeEmpty()->validate(
+                $nodeName,
+                $this->workingNode,
+                $this->parentNode,
+                $errorMessage
+            );
         }
 
         return $this;
     }
     /**
      * @param string $nodeName
+     * @param string|null $errorMessage
      * @return $this
      * @throws ConfigurationException
      *
      * Check if a $nodeName is empty. Throws a ConfigurationException if the $nodeName is empty
      */
-    public function cannotBeEmptyIfExists(string $nodeName) : Lucy
+    public function cannotBeEmptyIfExists(string $nodeName, string $errorMessage = null) : Lucy
     {
         if (array_key_exists($nodeName, $this->workingNode)) {
             if (is_bool($this->workingNode[$nodeName])) {
@@ -323,7 +325,14 @@ class Lucy implements \IteratorAggregate, \Countable
             }
 
             if (empty($this->workingNode[$nodeName])) {
-                throw new ConfigurationException('If \''.$nodeName.'\' exists, it cannot be empty');
+                if ($errorMessage) throw new ConfigurationException($errorMessage);
+
+                $message = sprintf(
+                    '\'%s\' cannot be empty if exists',
+                    $nodeName
+                );
+
+                throw new ConfigurationException($message);
             }
         }
 
@@ -331,6 +340,7 @@ class Lucy implements \IteratorAggregate, \Countable
     }
     /**
      * @param string $nodeName
+     * @param string|null $errorMessage
      * @return $this
      * @throws ConfigurationException
      *
@@ -340,13 +350,20 @@ class Lucy implements \IteratorAggregate, \Countable
      *
      * Throws an exception if $nodeName does not exist
      */
-    public function isString(string $nodeName) : Lucy
+    public function isString(string $nodeName, string $errorMessage = null) : Lucy
     {
         if ($this->conditionalIgnore === false) {
             $this->internalKeyExists($nodeName, $this->workingNode);
 
             if (!is_string($this->workingNode[$nodeName])) {
-                throw new ConfigurationException('\''.$nodeName.'\' should be a string');
+                if ($errorMessage) throw new ConfigurationException($errorMessage);
+
+                $message = sprintf(
+                    '\'%s\' has to be a string',
+                    $errorMessage
+                );
+
+                throw new ConfigurationException($message);
             }
         }
 
@@ -354,17 +371,25 @@ class Lucy implements \IteratorAggregate, \Countable
     }
     /**
      * @param string $nodeName
+     * @param string|null $errorMessage
      * @return $this
      * @throws ConfigurationException
      *
      * Check if a $nodeName is a string. Throws a ConfigurationException only if $nodeName
      * exists and is not a string. Silently ignores if the $nodeName does not exist.
      */
-    public function isStringIfExists(string $nodeName) : Lucy
+    public function isStringIfExists(string $nodeName, string $errorMessage = null) : Lucy
     {
         if (array_key_exists($nodeName, $this->workingNode)) {
             if (!is_string($this->workingNode[$nodeName])) {
-                throw new ConfigurationException('If \''.$nodeName.'\' exists, it should be a string');
+                if ($errorMessage) throw new ConfigurationException($errorMessage);
+
+                $message = sprintf(
+                    'If \'%s\' exists, it has to be a string',
+                    $nodeName
+                );
+
+                throw new ConfigurationException($message);
             }
         }
 
@@ -372,19 +397,27 @@ class Lucy implements \IteratorAggregate, \Countable
     }
     /**
      * @param string $nodeName
+     * @param string|null $errorMessage
      * @return Lucy
      * @throws ConfigurationException
      *
      * Does the same thing as Lucy::isString() but for numbers. The check is done with is_numeric
      * function so a string '2.3' passes as a number.
      */
-    public function isNumeric(string $nodeName): Lucy
+    public function isNumeric(string $nodeName, string $errorMessage = null): Lucy
     {
         if ($this->conditionalIgnore === false) {
             $this->internalKeyExists($nodeName, $this->workingNode);
 
             if (!is_numeric($this->workingNode[$nodeName])) {
-                throw new ConfigurationException('\''.$nodeName.'\' should be a number');
+                if ($errorMessage) throw new ConfigurationException($errorMessage);
+
+                $message = sprintf(
+                    '\'%s\' should be a numeric value',
+                    $nodeName
+                );
+
+                throw new ConfigurationException($message);
             }
         }
 
@@ -392,6 +425,7 @@ class Lucy implements \IteratorAggregate, \Countable
     }
     /**
      * @param string $nodeName
+     * @param string|null $errorMessage
      * @return Lucy
      * @throws ConfigurationException
      *
@@ -400,30 +434,45 @@ class Lucy implements \IteratorAggregate, \Countable
      *
      * The check is done with is_numeric function so a string '2.3' passes as a number.
      */
-    public function isNumericIfExists(string $nodeName): Lucy
+    public function isNumericIfExists(string $nodeName, string $errorMessage = null): Lucy
     {
         $this->internalKeyExists($nodeName, $this->workingNode);
 
         if (!is_numeric($this->workingNode[$nodeName])) {
-            throw new ConfigurationException('\''.$nodeName.'\' should be a number');
+            if ($errorMessage) throw new ConfigurationException($errorMessage);
+
+            $message = sprintf(
+                '\'%s\' has to be a numeric value',
+                $nodeName
+            );
+
+            throw new ConfigurationException($message);
         }
 
         return $this;
     }
     /**
      * @param string $nodeName
+     * @param string|null $errorMessage
      * @return $this
      * @throws ConfigurationException
      *
      * Does the same thing as Lucy::isString() but for arrays
      */
-    public function isArray(string $nodeName) : Lucy
+    public function isArray(string $nodeName, string $errorMessage = null) : Lucy
     {
         if ($this->conditionalIgnore === false) {
             $this->internalKeyExists($nodeName, $this->workingNode);
 
             if (!is_array($this->workingNode[$nodeName])) {
-                throw new ConfigurationException('\''.$nodeName.'\' has to be an array');
+                if ($errorMessage) throw new ConfigurationException($errorMessage);
+
+                $message = sprintf(
+                    '\'%s\' has to be an array',
+                    $nodeName
+                );
+
+                throw new ConfigurationException($message);
             }
         }
 
@@ -431,17 +480,26 @@ class Lucy implements \IteratorAggregate, \Countable
     }
     /**
      * @param string $nodeName
+     * @param string|null $errorMessage
      * @return $this
      * @throws ConfigurationException
      *
      * Does the same thing as Lucy::isStringIfExists() but only for arrays
      */
-    public function isArrayIfExists(string $nodeName) : Lucy
+    public function isArrayIfExists(string $nodeName, string $errorMessage = null) : Lucy
     {
         if ($this->conditionalIgnore === false) {
             if (array_key_exists($nodeName, $this->workingNode)) {
                 if (!is_array($this->workingNode[$nodeName])) {
-                    throw new ConfigurationException('If exists, \''.$nodeName.'\' has to be an array for parent \''.$this->getNodeName().'\'');
+                    if ($errorMessage) throw new ConfigurationException($errorMessage);
+
+                    $message = sprintf(
+                        'If exists, \'%s\' has to be an array for parent \'%s\'',
+                        $nodeName,
+                        $this->getNodeName()
+                    );
+
+                    throw new ConfigurationException($message);
                 }
             }
         }
@@ -450,18 +508,26 @@ class Lucy implements \IteratorAggregate, \Countable
     }
     /**
      * @param string $nodeName
+     * @param string|null $errorMessage
      * @return $this
      * @throws ConfigurationException
      *
      * Does the same thing as Lucy::isString() but only for boolean values
      */
-    public function isBoolean(string $nodeName) : Lucy
+    public function isBoolean(string $nodeName, string $errorMessage = null) : Lucy
     {
         if ($this->conditionalIgnore === false) {
             $this->internalKeyExists($nodeName, $this->workingNode);
 
             if (!is_bool($this->workingNode[$nodeName])) {
-                throw new ConfigurationException('\''.$nodeName.'\' has to be a boolean');
+                if ($errorMessage) throw new ConfigurationException($errorMessage);
+
+                $message = sprintf(
+                    '\'%s\' has to be a boolean',
+                    $nodeName
+                );
+
+                throw new ConfigurationException($message);
             }
         }
 
@@ -469,17 +535,26 @@ class Lucy implements \IteratorAggregate, \Countable
     }
     /**
      * @param string $nodeName
+     * @param string|null $errorMessage
      * @return $this
      * @throws ConfigurationException
      *
      * Does the same thing as Lucy::isStringIfExists() but only for booleans
      */
-    public function isBooleanIfExists(string $nodeName) : Lucy
+    public function isBooleanIfExists(string $nodeName, string $errorMessage = null) : Lucy
     {
         if ($this->conditionalIgnore === false) {
             if (array_key_exists($nodeName, $this->workingNode)) {
                 if (!is_bool($this->workingNode[$nodeName])) {
-                    throw new ConfigurationException('If exists, \''.$nodeName.'\' has to be a boolean for parent \''.$this->getNodeName().'\'');
+                    if ($errorMessage) throw new ConfigurationException($errorMessage);
+
+                    $message = sprintf(
+                        'If exists, \'%s\' has to be a boolean for parent \'%s\'',
+                        $nodeName,
+                        $errorMessage
+                    );
+
+                    throw new ConfigurationException($message);
                 }
             }
         }
@@ -488,6 +563,7 @@ class Lucy implements \IteratorAggregate, \Countable
     }
     /**
      * @param string $nodeName
+     * @param string|null $errorMessage
      * @return $this
      * @throws ConfigurationException
      *
@@ -497,18 +573,31 @@ class Lucy implements \IteratorAggregate, \Countable
      *
      * Throws an exception if all of the keys are not strings
      */
-    public function isAssociativeStringArray(string $nodeName) : Lucy
+    public function isAssociativeStringArray(string $nodeName, string $errorMessage = null) : Lucy
     {
         if ($this->conditionalIgnore === false) {
             if (!is_array($this->workingNode[$nodeName])) {
-                throw new ConfigurationException('\''.$nodeName.'\' has to be a associative array with string keys');
+                $message = sprintf(
+                    '\'%s\' has to be a array with string keys',
+                    $nodeName
+                );
+
+                throw new ConfigurationException($message);
             }
 
             $keys = array_keys($this->workingNode[$nodeName]);
 
             foreach ($keys as $key) {
                 if (!is_string($key)) {
-                    throw new ConfigurationException('\''.$nodeName.'\' has to be a associative array with string keys');
+                    if ($errorMessage) throw new ConfigurationException($errorMessage);
+
+                    $message = sprintf(
+                        '\'%s\' has to be a associative array with string keys. Key \'%s\' is not a string',
+                        $nodeName,
+                        $key
+                    );
+
+                    throw new ConfigurationException($message);
                 }
             }
         }
@@ -518,16 +607,25 @@ class Lucy implements \IteratorAggregate, \Countable
     /**
      * @param $nodeName
      * @param array $values
+     * @param string|null $errorMessage
      * @return Lucy
      * @throws ConfigurationException
      */
-    public function hasToBeOneOf($nodeName, array $values) : Lucy
+    public function hasToBeOneOf($nodeName, array $values, string $errorMessage = null) : Lucy
     {
         if ($this->conditionalIgnore === false) {
             $this->internalKeyExists($nodeName, $this->workingNode);
 
             if (in_array($this->workingNode[$nodeName], $values) === false) {
-                throw new ConfigurationException('One of values '.implode(', ', $values).' in node \''.$nodeName.'\' has to be present');
+                if ($errorMessage) throw new ConfigurationException($errorMessage);
+
+                $message = sprintf(
+                    'One of values \'%s\' in node \'%s\' has to be present',
+                    implode(', ', $values),
+                    $nodeName
+                );
+
+                throw new ConfigurationException($message);
             }
         }
 
@@ -557,12 +655,15 @@ class Lucy implements \IteratorAggregate, \Countable
     /**
      * @param string $nodeName
      * @param array $node
+     * @param string|null $errorMessage
      * @return $this
      * @throws ConfigurationException
      */
-    private function internalKeyExists(string $nodeName, array $node)
+    private function internalKeyExists(string $nodeName, array $node, string $errorMessage = null)
     {
         if (!array_key_exists($nodeName, $node)) {
+            if ($errorMessage) throw new ConfigurationException($errorMessage);
+
             throw new ConfigurationException('Invalid configuration. \''.$nodeName.'\' does not exist for parent node \''.$this->getNodeName().'\'');
         }
 

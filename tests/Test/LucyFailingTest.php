@@ -25,7 +25,7 @@ class LucyFailingTest extends TestCase
 
     public function testLucySubtreeTypeFail()
     {
-        $testValidArray = [
+        $testInvalidArray = [
             'configuration' => [
                 'trueBoolean' => 'not boolean',
                 'falseBoolean' => false,
@@ -38,7 +38,7 @@ class LucyFailingTest extends TestCase
 
         $exceptionEntered = false;
         try {
-            $lucy = new Lucy('configuration', $testValidArray);
+            $lucy = new Lucy('configuration', $testInvalidArray);
 
             $lucy
                 ->stepInto('configuration')
@@ -51,7 +51,7 @@ class LucyFailingTest extends TestCase
 
         $exceptionEntered = false;
         try {
-            $lucy = new Lucy('configuration', $testValidArray);
+            $lucy = new Lucy('configuration', $testInvalidArray);
 
             $lucy
                 ->stepInto('configuration')
@@ -66,7 +66,7 @@ class LucyFailingTest extends TestCase
 
         $exceptionEntered = false;
         try {
-            $lucy = new Lucy('configuration', $testValidArray);
+            $lucy = new Lucy('configuration', $testInvalidArray);
 
             $lucy
                 ->stepInto('configuration')
@@ -81,7 +81,7 @@ class LucyFailingTest extends TestCase
 
         $exceptionEntered = false;
         try {
-            $lucy = new Lucy('configuration', $testValidArray);
+            $lucy = new Lucy('configuration', $testInvalidArray);
 
             $lucy
                 ->stepInto('configuration')

@@ -6,7 +6,7 @@ use Lucy\Exception\ConfigurationException;
 use Lucy\Lucy;
 use PHPUnit\Framework\TestCase;
 
-class LucyTest extends TestCase
+class LucyCompleteTest extends TestCase
 {
     public function testLucyRootNode()
     {
