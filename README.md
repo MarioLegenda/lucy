@@ -155,9 +155,11 @@ $lucy
     });
 ```
 
-`applyToSubElementsOfIfTheyExists` is also available if you don't know if the element will
-actually exist.
+`applyToSubElementsOfIfTheyExists` is also available if you don't know if the elements will
+actually exist. In that case, this method will call the callback only on the elements that do
+exist and skip the rest.
 
+#### 4. API reference
 
 ## 5. Setting up tests
 
