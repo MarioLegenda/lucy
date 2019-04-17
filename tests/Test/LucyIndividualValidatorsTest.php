@@ -46,6 +46,15 @@ class LucyIndividualValidatorsTest extends TestCase
         }
 
         static::assertFalse($enteredException);
+
+        $enteredException = false;
+        try {
+            $lucy->keyHasToExist('invalid');
+        } catch (ConfigurationException $e) {
+            $enteredException = true;
+        }
+
+        static::assertTrue($enteredException);
     }
 
     public function testCannotBeEmpty()
@@ -60,5 +69,45 @@ class LucyIndividualValidatorsTest extends TestCase
         }
 
         static::assertFalse($enteredException);
+
+        $lucy = new Lucy('configuration', $this->deepArray);
+
+        $enteredException = false;
+        try {
+            $lucy->cannotBeEmpty('invalid');
+        } catch (ConfigurationException $e) {
+            $enteredException = true;
+        }
+
+        static::assertTrue($enteredException);
+    }
+
+    public function testCannotBeEmptyIfExists()
+    {
+        $lucy = new Lucy('configuration', $this->deepArray);
+
+        $enteredException = false;
+        try {
+            $lucy->cannotBeEmptyIfExists('configuration');
+        } catch (ConfigurationException $e) {
+            $enteredException = true;
+        }
+
+        static::assertFalse($enteredException);
+
+        $configuration = [
+            'configuration' => null
+        ];
+
+        $lucy = new Lucy('configuration', $configuration);
+
+        $enteredException = false;
+        try {
+            $lucy->cannotBeEmptyIfExists('configuration');
+        } catch (ConfigurationException $e) {
+            $enteredException = true;
+        }
+
+        static::assertTrue($enteredException);
     }
 }

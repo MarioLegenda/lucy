@@ -4,6 +4,7 @@
 namespace Lucy\Validator;
 
 use Lucy\Validator\Implementation\CannotBeEmpty;
+use Lucy\Validator\Implementation\CannotBeEmptyIfExists;
 use Lucy\Validator\Implementation\KeyHasToExist;
 
 final class Factory
@@ -30,6 +31,7 @@ final class Factory
         // allowed as property values in PHP
         static::$validators[KeyHasToExist::class] = function() { return new KeyHasToExist(); };
         static::$validators[CannotBeEmpty::class] = function() { return new CannotBeEmpty(); };
+        static::$validators[CannotBeEmptyIfExists::class] = function() { return new CannotBeEmptyIfExists(); };
     }
     /**
      * @param string $name

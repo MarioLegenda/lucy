@@ -319,22 +319,12 @@ class Lucy implements \IteratorAggregate, \Countable
      */
     public function cannotBeEmptyIfExists(string $nodeName, string $errorMessage = null) : Lucy
     {
-        if (array_key_exists($nodeName, $this->workingNode)) {
-            if (is_bool($this->workingNode[$nodeName])) {
-                return $this;
-            }
-
-            if (empty($this->workingNode[$nodeName])) {
-                if ($errorMessage) throw new ConfigurationException($errorMessage);
-
-                $message = sprintf(
-                    '\'%s\' cannot be empty if exists',
-                    $nodeName
-                );
-
-                throw new ConfigurationException($message);
-            }
-        }
+        $this->validator->cannotBeEmptyIfExists()->validate(
+            $nodeName,
+            $this->workingNode,
+            $this->parentNode,
+            $errorMessage
+        );
 
         return $this;
     }

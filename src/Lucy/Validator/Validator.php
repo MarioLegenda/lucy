@@ -3,6 +3,7 @@
 namespace Lucy\Validator;
 
 use Lucy\Validator\Implementation\CannotBeEmpty;
+use Lucy\Validator\Implementation\CannotBeEmptyIfExists;
 use Lucy\Validator\Implementation\KeyHasToExist;
 
 final class Validator
@@ -21,6 +22,13 @@ final class Validator
     public function cannotBeEmpty(): ValidatorInterface
     {
         return Factory::createAndGet(CannotBeEmpty::class);
+    }
+    /**
+     * @return ValidatorInterface
+     */
+    public function cannotBeEmptyIfExists(): ValidatorInterface
+    {
+        return Factory::createAndGet(CannotBeEmptyIfExists::class);
     }
     /**
      * @return Validator
