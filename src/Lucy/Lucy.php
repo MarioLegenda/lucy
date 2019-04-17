@@ -449,19 +449,12 @@ class Lucy implements \IteratorAggregate, \Countable
     public function isArrayIfExists(string $nodeName, string $errorMessage = null) : Lucy
     {
         if ($this->conditionalIgnore === false) {
-            if (array_key_exists($nodeName, $this->workingNode)) {
-                if (!is_array($this->workingNode[$nodeName])) {
-                    if ($errorMessage) throw new ConfigurationException($errorMessage);
-
-                    $message = sprintf(
-                        'If exists, \'%s\' has to be an array for parent \'%s\'',
-                        $nodeName,
-                        $this->getNodeName()
-                    );
-
-                    throw new ConfigurationException($message);
-                }
-            }
+            $this->validator->isArrayIfExists()->validate(
+                $nodeName,
+                $this->workingNode,
+                $this->parentNode,
+                $errorMessage
+            );
         }
 
         return $this;
