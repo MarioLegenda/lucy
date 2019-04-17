@@ -7,6 +7,7 @@ use Lucy\Validator\Implementation\CannotBeEmptyIfExists;
 use Lucy\Validator\Implementation\IsArray;
 use Lucy\Validator\Implementation\IsArrayIfExists;
 use Lucy\Validator\Implementation\IsBoolean;
+use Lucy\Validator\Implementation\IsBooleanIfExists;
 use Lucy\Validator\Implementation\IsNumeric;
 use Lucy\Validator\Implementation\IsNumericIfExists;
 use Lucy\Validator\Implementation\IsString;
@@ -85,6 +86,13 @@ final class Validator
     public function isBoolean(): ValidatorInterface
     {
         return Factory::createAndGet(IsBoolean::class);
+    }
+    /**
+     * @return ValidatorInterface
+     */
+    public function isBooleanIfExists(): ValidatorInterface
+    {
+        return Factory::createAndGet(IsBooleanIfExists::class);
     }
     /**
      * @return Validator

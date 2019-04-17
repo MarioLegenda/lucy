@@ -398,4 +398,48 @@ class LucyIndividualValidatorsTest extends TestCase
 
         static::assertTrue($enteredException);
     }
+
+    public function isBooleanIfExists()
+    {
+        $configuration = ['configuration' => true];
+
+        $lucy = new Lucy('configuration', $configuration);
+
+        $enteredException = false;
+        try {
+            $lucy->isBooleanIfExists('configuration');
+        } catch (ConfigurationException $e) {
+            $enteredException = true;
+        }
+
+        static::assertFalse($enteredException);
+
+        $configuration = ['configuration' => null];
+
+        $lucy = new Lucy('configuration', $configuration);
+
+        $enteredException = false;
+        try {
+            $lucy->isBooleanIfExists('not_exists');
+        } catch (ConfigurationException $e) {
+            $enteredException = true;
+        }
+
+        static::assertFalse($enteredException);
+
+        $configuration = [
+            'configuration' => null
+        ];
+
+        $lucy = new Lucy('configuration', $configuration);
+
+        $enteredException = false;
+        try {
+            $lucy->isBooleanIfExists('configuration');
+        } catch (ConfigurationException $e) {
+            $enteredException = true;
+        }
+
+        static::assertTrue($enteredException);
+    }
 }

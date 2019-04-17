@@ -491,19 +491,12 @@ class Lucy implements \IteratorAggregate, \Countable
     public function isBooleanIfExists(string $nodeName, string $errorMessage = null) : Lucy
     {
         if ($this->conditionalIgnore === false) {
-            if (array_key_exists($nodeName, $this->workingNode)) {
-                if (!is_bool($this->workingNode[$nodeName])) {
-                    if ($errorMessage) throw new ConfigurationException($errorMessage);
-
-                    $message = sprintf(
-                        'If exists, \'%s\' has to be a boolean for parent \'%s\'',
-                        $nodeName,
-                        $errorMessage
-                    );
-
-                    throw new ConfigurationException($message);
-                }
-            }
+            $this->validator->isBooleanIfExists()->validate(
+                $nodeName,
+                $this->workingNode,
+                $this->parentNode,
+                $errorMessage
+            );
         }
 
         return $this;

@@ -8,6 +8,7 @@ use Lucy\Validator\Implementation\CannotBeEmptyIfExists;
 use Lucy\Validator\Implementation\IsArray;
 use Lucy\Validator\Implementation\IsArrayIfExists;
 use Lucy\Validator\Implementation\IsBoolean;
+use Lucy\Validator\Implementation\IsBooleanIfExists;
 use Lucy\Validator\Implementation\IsNumeric;
 use Lucy\Validator\Implementation\IsNumericIfExists;
 use Lucy\Validator\Implementation\IsString;
@@ -46,6 +47,7 @@ final class Factory
         static::$validators[IsArray::class] = function() { return new IsArray(); };
         static::$validators[IsArrayIfExists::class] = function() { return new IsArrayIfExists(); };
         static::$validators[IsBoolean::class] = function() { return new IsBoolean(); };
+        static::$validators[IsBooleanIfExists::class] = function() { return new IsBooleanIfExists(); };
     }
     /**
      * @param string $name
