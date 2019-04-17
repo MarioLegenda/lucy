@@ -3,12 +3,14 @@
 namespace Lucy;
 
 use Lucy\Exception\ConfigurationException;
-use Lucy\Validator\KeyExistsTrait;
+use Lucy\Util\CreateGeneratorTrait;
+use Lucy\Util\KeyExistsTrait;
 use Lucy\Validator\Validator;
 
 class Lucy implements \IteratorAggregate, \Countable
 {
     use KeyExistsTrait;
+    use CreateGeneratorTrait;
     /**
      * @var string $nodeName
      */
@@ -215,18 +217,20 @@ class Lucy implements \IteratorAggregate, \Countable
      */
     public function applyToSubElements(array $childNodes, \Closure $closure) : Lucy
     {
-        if ($this->conditionalIgnore === false) {
-            foreach ($childNodes as $childNode) {
-                $this->internalKeyExists($childNode, $this->workingNode, $this->parentNode);
+        $childGen = $this->createGenerator($childNodes);
 
-                $value = $this->workingNode[$childNode];
+        foreach ($childGen as $entry) {
+            $childNode = $entry['value'];
 
-                if (is_array($value)) {
-                    $value = new Lucy($childNode, $this->workingNode);
-                }
+            $this->internalKeyExists($childNode, $this->workingNode, $this->parentNode);
 
-                $closure->__invoke($childNode, $value);
+            $value = $this->workingNode[$childNode];
+
+            if (is_array($value)) {
+                $value = new Lucy($childNode, $this->workingNode);
             }
+
+            $closure->__invoke($childNode, $value);
         }
 
         return $this;
@@ -240,7 +244,11 @@ class Lucy implements \IteratorAggregate, \Countable
     public function applyToSubElementsIfTheyExist(array $childNodes, \Closure $closure) : Lucy
     {
         if ($this->conditionalIgnore === false) {
-            foreach ($childNodes as $childNode) {
+            $childGen = $this->createGenerator($childNodes);
+
+            foreach ($childGen as $entry) {
+                $childNode = $entry['value'];
+
                 if (!array_key_exists($childNode, $this->workingNode)) {
                     continue;
                 }
@@ -634,19 +642,6 @@ class Lucy implements \IteratorAggregate, \Countable
             $parent = $this->getParent();
 
             $this->internalKeyExists($name, $parent);
-        }
-    }
-    /**
-     * @param array $values
-     * @return \Generator
-     */
-    private function createGenerator(array $values): \Generator
-    {
-        foreach ($values as $key => $value) {
-            yield [
-                'key' => $key,
-                'value' => $value
-            ];
         }
     }
 }

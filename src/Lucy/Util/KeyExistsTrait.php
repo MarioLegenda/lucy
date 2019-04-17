@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Lucy\Validator;
+namespace Lucy\Util;
 
 
 use Lucy\Exception\ConfigurationException;

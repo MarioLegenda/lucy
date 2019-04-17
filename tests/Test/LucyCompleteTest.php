@@ -37,7 +37,7 @@ class LucyCompleteTest extends TestCase
                 ->isArray('insert')
                 ->isArray('update')
                 ->isArray('delete')
-                ->applyToSubelements(array('select', 'insert', 'update', 'delete'), function($nodeName, Lucy $lucy) {
+                ->applyToSubElements(array('select', 'insert', 'update', 'delete'), function($nodeName, Lucy $lucy) {
                     foreach ($lucy as $nodeName => $nodeValue) {
                         $lucy->isAssociativeStringArray($nodeName);
                     }

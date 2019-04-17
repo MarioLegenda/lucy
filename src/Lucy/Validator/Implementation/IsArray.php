@@ -6,7 +6,7 @@ namespace Lucy\Validator\Implementation;
 
 use Lucy\Exception\ConfigurationException;
 use Lucy\Lucy;
-use Lucy\Validator\KeyExistsTrait;
+use Lucy\Util\KeyExistsTrait;
 use Lucy\Validator\ValidatorInterface;
 
 class IsArray implements ValidatorInterface

@@ -3,7 +3,7 @@
 namespace Lucy\Validator\Implementation;
 
 use Lucy\Lucy;
-use Lucy\Validator\KeyExistsTrait;
+use Lucy\Util\KeyExistsTrait;
 use Lucy\Validator\ValidatorInterface;
 
 class KeyHasToExist implements ValidatorInterface

@@ -6,10 +6,12 @@ namespace Lucy\Validator\Implementation;
 
 use Lucy\Exception\ConfigurationException;
 use Lucy\Lucy;
+use Lucy\Util\CreateGeneratorTrait;
 use Lucy\Validator\ValidatorInterface;
 
 class IsAssociativeStringArray implements ValidatorInterface
 {
+    use CreateGeneratorTrait;
     /**
      * @inheritDoc
      */
@@ -38,7 +40,9 @@ class IsAssociativeStringArray implements ValidatorInterface
 
         $keys = array_keys($value[$name]);
 
-        foreach ($keys as $key) {
+        $keysGen = $this->createGenerator($keys);
+        foreach ($keysGen as $entry) {
+            $key = $entry['value'];
             if (!is_string($key)) {
                 if ($errorMessage) throw new ConfigurationException($errorMessage);
 
