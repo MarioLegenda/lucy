@@ -161,7 +161,7 @@ exist and skip the rest.
 
 #### 4. API reference
 
-## `Lucy::__construct(string $nodeName, array $node, Lucy $parentNode = null)`
+#### `Lucy::__construct(string $nodeName, array $node, Lucy $parentNode = null)`
 
 Create a new instance of *Lucy*. `$parentNode` is meant for internal *Lucy* purposes and
 is not meant to be used in client code. 
