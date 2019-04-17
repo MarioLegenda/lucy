@@ -442,4 +442,56 @@ class LucyIndividualValidatorsTest extends TestCase
 
         static::assertTrue($enteredException);
     }
+
+    public function testIsAssociativeStringArray()
+    {
+        $configuration = ['configuration' => [
+                'entry1' => 1,
+                'entry2' => 2,
+            ]
+        ];
+
+        $lucy = new Lucy('configuration', $configuration);
+
+        $enteredException = false;
+        try {
+            $lucy->isAssociativeStringArray('configuration');
+        } catch (ConfigurationException $e) {
+            $enteredException = true;
+        }
+
+        static::assertFalse($enteredException);
+
+        $configuration = [
+            'configuration' => null
+        ];
+
+        $lucy = new Lucy('configuration', $configuration);
+
+        $enteredException = false;
+        try {
+            $lucy->isAssociativeStringArray('configuration');
+        } catch (ConfigurationException $e) {
+            $enteredException = true;
+        }
+
+        static::assertTrue($enteredException);
+
+        $configuration = ['configuration' => [
+            'entry1' => 1,
+            0 => 2,
+        ]
+        ];
+
+        $lucy = new Lucy('configuration', $configuration);
+
+        $enteredException = false;
+        try {
+            $lucy->isAssociativeStringArray('configuration');
+        } catch (ConfigurationException $e) {
+            $enteredException = true;
+        }
+
+        static::assertTrue($enteredException);
+    }
 }

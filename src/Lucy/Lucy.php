@@ -516,30 +516,12 @@ class Lucy implements \IteratorAggregate, \Countable
     public function isAssociativeStringArray(string $nodeName, string $errorMessage = null) : Lucy
     {
         if ($this->conditionalIgnore === false) {
-            if (!is_array($this->workingNode[$nodeName])) {
-                $message = sprintf(
-                    '\'%s\' has to be a array with string keys',
-                    $nodeName
-                );
-
-                throw new ConfigurationException($message);
-            }
-
-            $keys = array_keys($this->workingNode[$nodeName]);
-
-            foreach ($keys as $key) {
-                if (!is_string($key)) {
-                    if ($errorMessage) throw new ConfigurationException($errorMessage);
-
-                    $message = sprintf(
-                        '\'%s\' has to be a associative array with string keys. Key \'%s\' is not a string',
-                        $nodeName,
-                        $key
-                    );
-
-                    throw new ConfigurationException($message);
-                }
-            }
+            $this->validator->isAssociativeStringArray()->validate(
+                $nodeName,
+                $this->workingNode,
+                $this->parentNode,
+                $errorMessage
+            );
         }
 
         return $this;
