@@ -495,6 +495,48 @@ class LucyIndividualValidatorsTest extends TestCase
         static::assertTrue($enteredException);
     }
 
+    public function testIsEnum()
+    {
+        $configuration = [
+            'configuration' => [
+                'enum1',
+                'enum2',
+                'enum3',
+            ]
+        ];
+
+        $lucy = new Lucy('configuration', $configuration);
+
+
+        $enteredException = false;
+        try {
+            $lucy
+                ->isEnum('configuration', [
+                    'enum1',
+                    'enum2',
+                    'enum3',
+                ]);
+        } catch (ConfigurationException $e) {
+            $enteredException = true;
+        }
+
+        static::assertFalse($enteredException);
+
+        $enteredException = false;
+        try {
+            $lucy
+                ->isEnum('configuration', [
+                    'non_existent1',
+                    'non_existent2',
+                    'non_existent3',
+                ]);
+        } catch (ConfigurationException $e) {
+            $enteredException = true;
+        }
+
+        static::assertTrue($enteredException);
+    }
+
     public function testClosureValidator()
     {
         $lucy = new Lucy('configuration', $this->deepArray);

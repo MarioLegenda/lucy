@@ -525,23 +525,41 @@ class Lucy implements \IteratorAggregate, \Countable
      * @param string|null $errorMessage
      * @return Lucy
      * @throws ConfigurationException
+     *
+     * The rule is that at least one value from $values has to be present
+     * in $this->workingNode[$nodeName]
      */
-    public function hasToBeOneOf($nodeName, array $values, string $errorMessage = null) : Lucy
+    public function isEnum($nodeName, array $values, string $errorMessage = null) : Lucy
     {
         if ($this->conditionalIgnore === false) {
             $this->internalKeyExists($nodeName, $this->workingNode);
 
-            if (in_array($this->workingNode[$nodeName], $values) === false) {
-                if ($errorMessage) throw new ConfigurationException($errorMessage);
+            $valGen = $this->createGenerator($values);
 
-                $message = sprintf(
-                    'One of values \'%s\' in node \'%s\' has to be present',
-                    implode(', ', $values),
-                    $nodeName
-                );
+            foreach ($valGen as $entry) {
+                $value = $entry['value'];
 
-                throw new ConfigurationException($message);
+                if (in_array($value, $this->workingNode[$nodeName])) {
+                    return $this;
+                }
             }
+
+            $message = sprintf(
+                'Invalid enum. At least one value in array [%s] has to exist in node \'%s\'',
+                implode(', ', $values),
+                $nodeName
+            );
+
+            if ($this->parentNode) {
+                $message = sprintf(
+                    'Invalid enum. At least one value in array [%s] has to exist in node \'%s\' with parent node \'%s\'',
+                    implode(', ', $values),
+                    $nodeName,
+                    $this->parentNode->getNodeName()
+                );
+            }
+
+            throw new ConfigurationException($message);
         }
 
         return $this;
@@ -604,6 +622,19 @@ class Lucy implements \IteratorAggregate, \Countable
             $parent = $this->getParent();
 
             $this->internalKeyExists($name, $parent);
+        }
+    }
+    /**
+     * @param array $values
+     * @return \Generator
+     */
+    private function createGenerator(array $values): \Generator
+    {
+        foreach ($values as $key => $value) {
+            yield [
+                'key' => $key,
+                'value' => $value
+            ];
         }
     }
 }
