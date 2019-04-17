@@ -98,7 +98,7 @@ the public methods that *Lucy* has are chainable and you can use them in any ord
 Other methods include `keyHasToExist`, `isNumeric`, `isBoolean`, `isEnum` and `isAssociativeStringArray`.
 
 There is also a `stepOut` method. With this method, you are going up in the tree. In our
-example about, previously we stepped into the `configuration` and `database` entry so we
+example above, previously we stepped into the `configuration` and `database` entry so we
 can validate the entries within them. After we are done validating the `database` entry,
 we `stepOut` of it, and validate the `external_service` by stepping into that entry.
 
@@ -122,12 +122,12 @@ isArrayIfExists
 
 #### Callable validation
 
-If you would like a specific validation on a certain element, you can use a callable validators.
+If you would like a specific custom validation on a certain element, you can use a callable validators.
 Those validators accept a closure (anonymous function) and pass the node name and the current *Lucy*
 object.
 
 ```
-$lucy->applyCallback('configuration, function($nodeName, Lucy $lucy) {
+$lucy->applyCallback(['configuration'], function($nodeName, Lucy $lucy) {
     // $nodeName in this example is 'configuration' and
     // $lucy object can validate 'configuration' entry
     
