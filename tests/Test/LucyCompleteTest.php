@@ -21,27 +21,27 @@ class LucyCompleteTest extends TestCase
             $lucy
                 ->cannotBeEmpty('configuration')
                 ->isArray('configuration')
-                ->stepInto('configuration')
-                ->isArrayIfExists('connection')
-                ->stepIntoIfExists('connection')
-                ->isString('host')
-                ->isString('database_name')
-                ->isString('user')
-                ->isString('password')
-                ->isBooleanIfExists('persistent')
-                ->stepOut()
-                ->isStringIfExists('sql_import')
-                ->cannotBeEmptyIfExists('simple')
-                ->stepIntoIfExists('simple')
-                ->isArray('select')
-                ->isArray('insert')
-                ->isArray('update')
-                ->isArray('delete')
-                ->applyToSubElements(array('select', 'insert', 'update', 'delete'), function($nodeName, Lucy $lucy) {
-                    foreach ($lucy as $nodeName => $nodeValue) {
-                        $lucy->isAssociativeStringArray($nodeName);
-                    }
-                });
+                    ->stepInto('configuration')
+                    ->isArrayIfExists('connection')
+                        ->stepIntoIfExists('connection')
+                        ->isString('host')
+                        ->isString('database_name')
+                        ->isString('user')
+                        ->isString('password')
+                        ->isBooleanIfExists('persistent')
+                    ->stepOut()
+                    ->isStringIfExists('sql_import')
+                    ->cannotBeEmptyIfExists('simple')
+                        ->stepIntoIfExists('simple')
+                        ->isArray('select')
+                        ->isArray('insert')
+                        ->isArray('update')
+                        ->isArray('delete')
+                        ->applyToSubElements(array('select', 'insert', 'update', 'delete'), function($nodeName, Lucy $lucy) {
+                            foreach ($lucy as $nodeName => $nodeValue) {
+                                $lucy->isAssociativeStringArray($nodeName);
+                            }
+                        });
         } catch (ConfigurationException $e) {
             $exceptionEntered = true;
         }

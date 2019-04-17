@@ -27,6 +27,65 @@ component and *Lucy*, but they are on their way. I hope you like it.
 
 ## 3. Usage
 
+We will start with the most simple configuration array possible.
+
+```
+use Lucy;
+
+$configuration = [
+    'configuration' => []
+];
+
+$lucy = new Lucy('configuration', $configuration);
+
+$lucy->isArray('configuration');
+
+```
+
+This simple code will just validate that the `configuration` entry is an array.
+If the entry is not an array, a `Lucy\Exception\ConfigurationException` will be thrown
+so if you expect an invalid value in your configuration, wrap it in a `try/catch` block.
+
+So, lets expand on our example.
+
+```
+
+use Lucy;
+
+$configuration = [
+    'configuration' => [
+        'database' => [
+            'host' => 'localhost',
+            'database_name' => 'db_name',
+            'password' => 'password',
+            'user' => 'user'
+        ]
+    ]
+]
+
+$lucy = new Lucy('configuration', $configuration);
+
+$lucy
+    ->isArray('configuration')
+    ->cannotBeEmpty('configuration')
+    ->stepInto('configuration')
+        ->isArray('database')
+        ->cannotBeEmpty('database')
+        ->stepInto('database')
+            ->isString('host')->cannotBeEmpty('host')
+            ->isString('database_name')->cannotBeEmpty('host')
+            ->isString('password')->cannotBeEmpty('password')
+            ->isString('user')->cannotBeEmpty('user')
+
+```
+
+Here, we have a much better example. Deeply nested arrays are stepped into with
+the `stepInto` method. After that, you can validate the values that are within that
+array entry. We also introduced the `isString` and `cannotBeEmpty` methods. All of
+the public methods that *Lucy* has are chainable and you can use them in any order you wish.
+
+
+
 ## 4. Setting up tests
 
 There are no production dependencies but there are development dependencies. After you clone this repo with 
