@@ -1,0 +1,72 @@
+configuration:
+    connection:
+        host: 127.0.0.1
+        user: 'root'
+        password: 'root'
+        database_name: ''
+
+    sql_import: 'import/import.yml'
+
+    simple:
+        select:
+            find_all_users:
+                sql: select.find_all_users
+
+            by_column_filter_find_all_users:
+                sql: select.find_all_users
+                filter:
+                    by_column: id
+
+            find_exact_filter_find_all_users:
+                sql: select.find_all_users
+                filter:
+                    find: [id, 1]
+
+            normalize_if_one_exists_filter_find_all_users:
+                sql: 'SELECT * FROM user WHERE id = 1'
+                filter:
+                    normalize_if_one_exists: true
+
+            cascading_filter_find_all_users:
+                sql: select.find_all_users
+                filter:
+                    find: [id, 1]
+                    normalize_if_one_exists: true
+
+            normalize_joined_result_find_all_users:
+                sql: select.find_all_users
+                filter:
+                    normalize_joined_result:
+                        linking_column: 'id'
+                        columns: ['username']
+                    find: [id, 7]
+                    normalize_if_one_exists: true
+
+            find_user_by_id_with_object_return:
+                sql: 'SELECT * FROM user WHERE id = :id'
+                parameters: [id]
+                model:
+                    object: Test\Model\User
+            find_user_by_id:
+                sql: 'SELECT * FROM user WHERE id = :id'
+                parameters: [id]
+        delete:
+            delete_all_users:
+                sql: 'DELETE FROM user'
+            delete_user_by_id:
+                sql: 'DELETE FROM user WHERE id = :id'
+                parameters: [id]
+        update:
+            update_all_users:
+                sql: 'UPDATE user SET username = :username'
+                parameters: [username]
+                filter:
+                    find: [id, 1]
+                    normalize_if_one_exists: true
+            update_user_by_id:
+                sql: 'UPDATE user SET username = :username WHERE id = :id'
+                parameters: [username, id]
+        insert:
+            insert_user:
+                sql: 'INSERT INTO user (name, lastname, username) VALUES (:name, :lastname, :username)'
+                parameters: [name, lastname, username]

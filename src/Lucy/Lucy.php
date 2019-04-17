@@ -219,7 +219,13 @@ class Lucy implements \IteratorAggregate, \Countable
             foreach ($childNodes as $childNode) {
                 $this->internalKeyExists($childNode, $this->workingNode, $this->parentNode);
 
-                $closure->__invoke($childNode, $this->workingNode[$childNode]);
+                $value = $this->workingNode[$childNode];
+
+                if (is_array($value)) {
+                    $value = new Lucy($childNode, $this->workingNode);
+                }
+
+                $closure->__invoke($childNode, $value);
             }
         }
 
@@ -228,7 +234,8 @@ class Lucy implements \IteratorAggregate, \Countable
     /**
      * @param array $childNodes
      * @param \Closure $closure
-     * @return $this
+     * @return Lucy
+     * @throws ConfigurationException
      */
     public function applyToSubElementsIfTheyExist(array $childNodes, \Closure $closure) : Lucy
     {
@@ -238,7 +245,13 @@ class Lucy implements \IteratorAggregate, \Countable
                     continue;
                 }
 
-                $closure->__invoke($childNode, $this->workingNode[$childNode]);
+                $value = $this->workingNode[$childNode];
+
+                if (is_array($value)) {
+                    $value = new Lucy($childNode, $this->workingNode);
+                }
+
+                $closure->__invoke($childNode, $value);
             }
         }
 
@@ -573,7 +586,7 @@ class Lucy implements \IteratorAggregate, \Countable
     /**
      * @return \ArrayIterator
      */
-    public function getIterator()
+    public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->workingNode);
     }
