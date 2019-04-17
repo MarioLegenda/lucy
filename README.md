@@ -8,7 +8,8 @@
 1. Introduction
 2. Installation
 3. Usage
-4. Setting up tests
+4. API reference
+5. Setting up tests
 
 ## 1. Introduction
 
@@ -59,6 +60,10 @@ $configuration = [
             'database_name' => 'db_name',
             'password' => 'password',
             'user' => 'user'
+        ],
+        'external_service' => [
+            'api_key' => 'key',
+            'secret' => 'secret',
         ]
     ]
 ]
@@ -76,6 +81,12 @@ $lucy
             ->isString('database_name')->cannotBeEmpty('host')
             ->isString('password')->cannotBeEmpty('password')
             ->isString('user')->cannotBeEmpty('user')
+        ->stepOut()
+        ->cannotBeEmpty('external_service')
+        ->isArray('external_service')
+        ->stepInto('external_service')
+            ->isString('api_key')->cannotBeEmpty('api_key')
+            ->isString('secret')->cannotBeEmpty('secret')
 
 ```
 
@@ -84,9 +95,30 @@ the `stepInto` method. After that, you can validate the values that are within t
 array entry. We also introduced the `isString` and `cannotBeEmpty` methods. All of
 the public methods that *Lucy* has are chainable and you can use them in any order you wish.
 
+Other methods include `keyHasToExist`, `isNumeric`, `isBoolean`, `isEnum` and `isAssociativeStringArray`.
 
+There is also a `stepOut` method. With this method, you are going up in the tree. In our
+example about, previously we stepped into the `configuration` and `database` entry so we
+can validate the entries within them. After we are done validating the `database` entry,
+we `stepOut` of it, and validate the `external_service` by stepping into that entry.
 
-## 4. Setting up tests
+Use `stepInto` and `stepOut` methods to traverse the tree as you wish. It is also important to
+say that *Lucy* does not know that there is a next entry to step into. Under the hood, it creates
+instances of itself that become the children of the *Lucy* object that created them. In our example,
+*Lucy* object validating the `database` entry is a child of the *Lucy* object created for the
+`configuration` entry.
+
+*Lucy* also defines conditional methods. For example, `isNumeric` has a method `isNumericIfExists`.
+This method does exactly what it says. Only if an entry exists, this method will try to validate it.
+
+Other methods are
+
+```
+isBooleanIfExists
+isEnumIfExists
+```
+
+## 5. Setting up tests
 
 There are no production dependencies but there are development dependencies. After you clone this repo with 
 `git@github.com:MarioLegenda/lucy.git`, run `composer install`. The tests are in the `/tests` directory
