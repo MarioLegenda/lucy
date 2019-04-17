@@ -174,4 +174,50 @@ class LucyIndividualValidatorsTest extends TestCase
 
         static::assertTrue($enteredException);
     }
+
+    public function testIsNumeric()
+    {
+        $configuration = [
+            'isNumeric' => '7'
+        ];
+
+        $lucy = new Lucy('isNumeric', $configuration);
+
+        $enteredException = false;
+        try {
+            $lucy->isString('isNumeric');
+        } catch (ConfigurationException $e) {
+            $enteredException = true;
+        }
+
+        static::assertFalse($enteredException);
+
+        $configuration = [
+            'isNumeric' => null
+        ];
+
+        $lucy = new Lucy('isNumeric', $configuration);
+
+        $enteredException = false;
+        try {
+            $lucy->isString('isNumeric');
+        } catch (ConfigurationException $e) {
+            $enteredException = true;
+        }
+
+        $configuration = [
+            'isNumeric' => 7
+        ];
+
+        $lucy = new Lucy('isNumeric', $configuration);
+
+        $enteredException = false;
+        try {
+            $lucy->isString('isNumeric');
+        } catch (ConfigurationException $e) {
+            $enteredException = true;
+        }
+
+        static::assertTrue($enteredException);
+    }
 }

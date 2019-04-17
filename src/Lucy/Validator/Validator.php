@@ -4,6 +4,7 @@ namespace Lucy\Validator;
 
 use Lucy\Validator\Implementation\CannotBeEmpty;
 use Lucy\Validator\Implementation\CannotBeEmptyIfExists;
+use Lucy\Validator\Implementation\IsNumeric;
 use Lucy\Validator\Implementation\IsString;
 use Lucy\Validator\Implementation\IsStringIfExists;
 use Lucy\Validator\Implementation\KeyHasToExist;
@@ -45,6 +46,13 @@ final class Validator
     public function isStringIfExists(): ValidatorInterface
     {
         return Factory::createAndGet(IsStringIfExists::class);
+    }
+    /**
+     * @return ValidatorInterface
+     */
+    public function isNumeric(): ValidatorInterface
+    {
+        return Factory::createAndGet(IsNumeric::class);
     }
     /**
      * @return Validator
