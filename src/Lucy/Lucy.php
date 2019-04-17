@@ -3,10 +3,12 @@
 namespace Lucy;
 
 use Lucy\Exception\ConfigurationException;
+use Lucy\Validator\KeyExistsTrait;
 use Lucy\Validator\Validator;
 
 class Lucy implements \IteratorAggregate, \Countable
 {
+    use KeyExistsTrait;
     /**
      * @var string $nodeName
      */
@@ -16,7 +18,9 @@ class Lucy implements \IteratorAggregate, \Countable
      */
     private $conditionalIgnore = false;
     /**
-     * @var array $nodeName
+     * @var Lucy|null $parentNode
+     *
+     * Only null when the root Lucy is created
      */
     private $parentNode;
     /**
@@ -52,24 +56,13 @@ class Lucy implements \IteratorAggregate, \Countable
      */
     public function __construct(string $rootNode, array $workingNode, Lucy $parentNode = null)
     {
+        $this->validateConstruction(
+            $rootNode,
+            $workingNode,
+            $parentNode
+        );
+
         $this->nodeName = $rootNode;
-
-        if (empty($workingNode)) {
-            throw new ConfigurationException('Node has to be a non empty array for parent \''.$rootNode.'\'');
-        }
-
-        // this is what distinguishes the root node from the children
-        // not parent and no parent as a parameter
-        if (is_null($this->parentNode) and is_null($parentNode)) {
-            $this->internalKeyExists($rootNode, $workingNode);
-        }
-
-        if ($this->parentNode instanceof Lucy) {
-            $parent = $this->getParent();
-
-            $this->internalKeyExists($rootNode, $parent);
-        }
-
         $this->workingNode = $workingNode;
         $this->validator = Validator::create();
 
@@ -224,9 +217,9 @@ class Lucy implements \IteratorAggregate, \Countable
     {
         if ($this->conditionalIgnore === false) {
             foreach ($childNodes as $childNode) {
-                if ($this->internalKeyExists($childNode, $this->workingNode)) {
-                    $closure->__invoke($childNode, new Lucy($childNode, $this->workingNode[$childNode]));
-                }
+                $this->internalKeyExists($childNode, $this->workingNode, $this->parentNode);
+
+                $closure->__invoke($childNode, new Lucy($childNode, $this->workingNode[$childNode]));
             }
         }
 
@@ -575,27 +568,42 @@ class Lucy implements \IteratorAggregate, \Countable
         return count($this->workingNode);
     }
     /**
-     * @param string $nodeName
-     * @param array $node
-     * @param string|null $errorMessage
-     * @return $this
-     * @throws ConfigurationException
-     */
-    private function internalKeyExists(string $nodeName, array $node, string $errorMessage = null)
-    {
-        if (!array_key_exists($nodeName, $node)) {
-            if ($errorMessage) throw new ConfigurationException($errorMessage);
-
-            throw new ConfigurationException('Invalid configuration. \''.$nodeName.'\' does not exist for parent node \''.$this->getNodeName().'\'');
-        }
-
-        return $this;
-    }
-    /**
      * @return array|Lucy|null
      */
-    private function getParent()
+    private function getParent(): ?Lucy
     {
         return $this->parentNode;
+    }
+    /**
+     * @param string $name
+     * @param array $value
+     * @param Lucy|null $parentNode
+     * @throws ConfigurationException
+     */
+    private function validateConstruction(
+        string $name,
+        array $value,
+        Lucy $parentNode = null
+    ): void {
+        if (empty($value)) {
+            $message = sprintf(
+                'Node has to be a non empty array for parent \'%s\'',
+                $name
+            );
+
+            throw new ConfigurationException($message);
+        }
+
+        // this is what distinguishes the root node from the children
+        // not parent and no parent as a parameter
+        if (is_null($this->parentNode) and is_null($parentNode)) {
+            $this->internalKeyExists($name, $value, $parentNode);
+        }
+
+        if ($this->parentNode instanceof Lucy) {
+            $parent = $this->getParent();
+
+            $this->internalKeyExists($name, $parent);
+        }
     }
 }
