@@ -199,7 +199,7 @@ class Lucy implements \IteratorAggregate, \Countable
      * Invokes a custom anonymous function on the given node. It only works on the
      * currently working node
      */
-    public function applyClosure(string $nodeName, \Closure $closure) : Lucy
+    public function applyCallback(string $nodeName, \Closure $closure) : Lucy
     {
         if ($this->conditionalIgnore === false) {
             $closure->__invoke($nodeName, $this);

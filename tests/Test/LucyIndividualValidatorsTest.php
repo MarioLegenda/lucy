@@ -543,7 +543,7 @@ class LucyIndividualValidatorsTest extends TestCase
 
         $closureEntered = false;
         $that = $lucy;
-        $lucy->applyClosure('configuration', function(string $name, Lucy $node) use(&$closureEntered, $that) {
+        $lucy->applyCallback('configuration', function(string $name, Lucy $node) use(&$closureEntered, $that) {
             $closureEntered = true;
             static::assertEquals('configuration', $name);
 
