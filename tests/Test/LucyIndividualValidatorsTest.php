@@ -279,4 +279,35 @@ class LucyIndividualValidatorsTest extends TestCase
 
         static::assertTrue($enteredException);
     }
+
+    public function testIsArray()
+    {
+        $configuration = ['configuration' => []];
+
+        $lucy = new Lucy('configuration', $configuration);
+
+        $enteredException = false;
+        try {
+            $lucy->isArray('configuration');
+        } catch (ConfigurationException $e) {
+            $enteredException = true;
+        }
+
+        static::assertFalse($enteredException);
+
+        $configuration = [
+            'configuration' => null
+        ];
+
+        $lucy = new Lucy('configuration', $configuration);
+
+        $enteredException = false;
+        try {
+            $lucy->isArray('configuration');
+        } catch (ConfigurationException $e) {
+            $enteredException = true;
+        }
+
+        static::assertTrue($enteredException);
+    }
 }

@@ -428,18 +428,12 @@ class Lucy implements \IteratorAggregate, \Countable
     public function isArray(string $nodeName, string $errorMessage = null) : Lucy
     {
         if ($this->conditionalIgnore === false) {
-            $this->internalKeyExists($nodeName, $this->workingNode);
-
-            if (!is_array($this->workingNode[$nodeName])) {
-                if ($errorMessage) throw new ConfigurationException($errorMessage);
-
-                $message = sprintf(
-                    '\'%s\' has to be an array',
-                    $nodeName
-                );
-
-                throw new ConfigurationException($message);
-            }
+            $this->validator->isArray()->validate(
+                $nodeName,
+                $this->workingNode,
+                $this->parentNode,
+                $errorMessage
+            );
         }
 
         return $this;
