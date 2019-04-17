@@ -21,7 +21,7 @@ class IsNumeric implements ValidatorInterface
         Lucy $parent = null,
         string $errorMessage = null
     ): void {
-        $this->internalKeyExists($name, $value);
+        $this->internalKeyExists($name, $value, $parent, $errorMessage);
 
         if (!is_numeric($value[$name])) {
             if ($errorMessage) throw new ConfigurationException($errorMessage);

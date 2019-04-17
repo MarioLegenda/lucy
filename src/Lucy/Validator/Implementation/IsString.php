@@ -21,7 +21,7 @@ class IsString implements ValidatorInterface
         Lucy $parent = null,
         string $errorMessage = null
     ): void {
-        $this->internalKeyExists($name, $value);
+        $this->internalKeyExists($name, $value, $parent, $errorMessage);
 
         if (!is_string($value[$name])) {
             if ($errorMessage) throw new ConfigurationException($errorMessage);
