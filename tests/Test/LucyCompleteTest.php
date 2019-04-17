@@ -14,10 +14,6 @@ class LucyCompleteTest extends TestCase
 
         $lucy = new Lucy('configuration', $testArray);
 
-        static::assertEquals('configuration', $lucy->getNodeName());
-        static::assertEquals(1, count($lucy));
-        static::assertFalse($lucy->isEmpty());
-
         $exceptionEntered = false;
         try {
             $lucy->stepInto('non_existing_element');
