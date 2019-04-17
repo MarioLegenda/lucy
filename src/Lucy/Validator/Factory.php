@@ -38,18 +38,18 @@ final class Factory
     {
         // has to be initialised in the constructor because expressions are not
         // allowed as property values in PHP
-        static::$validators[KeyHasToExist::class] = function() { return new KeyHasToExist(); };
-        static::$validators[CannotBeEmpty::class] = function() { return new CannotBeEmpty(); };
-        static::$validators[CannotBeEmptyIfExists::class] = function() { return new CannotBeEmptyIfExists(); };
-        static::$validators[IsString::class] = function() { return new IsString(); };
-        static::$validators[IsStringIfExists::class] = function() { return new IsStringIfExists(); };
-        static::$validators[IsNumeric::class] = function() { return new IsNumeric(); };
-        static::$validators[IsNumericIfExists::class] = function() { return new IsNumericIfExists(); };
-        static::$validators[IsArray::class] = function() { return new IsArray(); };
-        static::$validators[IsArrayIfExists::class] = function() { return new IsArrayIfExists(); };
-        static::$validators[IsBoolean::class] = function() { return new IsBoolean(); };
-        static::$validators[IsBooleanIfExists::class] = function() { return new IsBooleanIfExists(); };
-        static::$validators[IsAssociativeStringArray::class] = function() { return new IsAssociativeStringArray(); };
+        static::$validators[KeyHasToExist::class]            = function(): ValidatorInterface { return new KeyHasToExist(); };
+        static::$validators[CannotBeEmpty::class]            = function(): ValidatorInterface { return new CannotBeEmpty(); };
+        static::$validators[CannotBeEmptyIfExists::class]    = function(): ValidatorInterface { return new CannotBeEmptyIfExists(); };
+        static::$validators[IsString::class]                 = function(): ValidatorInterface { return new IsString(); };
+        static::$validators[IsStringIfExists::class]         = function(): ValidatorInterface { return new IsStringIfExists(); };
+        static::$validators[IsNumeric::class]                = function(): ValidatorInterface { return new IsNumeric(); };
+        static::$validators[IsNumericIfExists::class]        = function(): ValidatorInterface { return new IsNumericIfExists(); };
+        static::$validators[IsArray::class]                  = function(): ValidatorInterface { return new IsArray(); };
+        static::$validators[IsArrayIfExists::class]          = function(): ValidatorInterface { return new IsArrayIfExists(); };
+        static::$validators[IsBoolean::class]                = function(): ValidatorInterface { return new IsBoolean(); };
+        static::$validators[IsBooleanIfExists::class]        = function(): ValidatorInterface { return new IsBooleanIfExists(); };
+        static::$validators[IsAssociativeStringArray::class] = function(): ValidatorInterface { return new IsAssociativeStringArray(); };
     }
     /**
      * @param string $name
