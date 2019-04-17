@@ -168,11 +168,11 @@ is not meant to be used in client code.
 
 If the `$nodeName` does not exist in `$node`, throws a `Lucy\Exception\ConfigurationException`.
 
-`Lucy::getNodeName(): string`
+#### `Lucy::getNodeName(): string`
 
 Returns a current node name.
 
-`Lucy::stepInto(string $nodeName, string $errorMessage)`
+#### `Lucy::stepInto(string $nodeName, string $errorMessage)`
 
 Steps into `$nodeName` and creates a new *Lucy* object to be validated on. 
 
@@ -180,15 +180,15 @@ Accepts an optional `$errorMessage` that is replaced with the original error mes
 
 If the `$nodeName` does not exist, throws a `Lucy\Exception\ConfigurationException`.
 
-`Lucy::stepIntoIfExists(string $nodeName)`
+#### `Lucy::stepIntoIfExists(string $nodeName)`
 
 Does the same thing as `stepInto` but does not throw exception if the node does not exist.
 
-`Lucy::stepOut()`
+#### `Lucy::stepOut()`
 
 Steps out of the current *Lucy* object and returns to the parent.
 
-`Lucy::applyCallback(string $nodeName, Closure $closure)`
+#### `Lucy::applyCallback(string $nodeName, Closure $closure)`
 
 Applies a user defined callback to `$nodeName`. The callback will receive a string `$nodeName` and
 a current *Lucy* object if the object is an array, otherwise, it will receive the value that is the index
@@ -196,7 +196,7 @@ of `$nodeName`
 
 If the `$nodeName` does not exist, throws a `Lucy\Exception\ConfigurationException`.
 
-`Lucy::applyToSubElement(array $childNodes, Closure $closure)`
+#### `Lucy::applyToSubElement(array $childNodes, Closure $closure)`
 
 Applies a user defined callback to all `$childNodes`. It receives the `$nodeName` of the
 currently traversed node and a *Lucy* object if the entry under it is an array, any other value
@@ -204,12 +204,12 @@ otherwise.
 
 If any of the child nodes does not exist, throws a `Lucy\Configuration\ConfigurationException`.
 
-`Lucy::applyToSubElementIfTheyExist(array $childNodes, Closure $closure)`
+#### `Lucy::applyToSubElementIfTheyExist(array $childNodes, Closure $closure)`
 
 Does the same thing as `applyToSubElements` but does not throw exception if one of the
 child nodes does not exist. If a child node doesn't exist, it skips it.
 
-`Lucy::keyHasToExist(string $nodeName, string $errorMessage = null)`
+#### `Lucy::keyHasToExist(string $nodeName, string $errorMessage = null)`
 
 Validates that the key `$nodeName` exists. 
 
@@ -217,7 +217,7 @@ Accepts an optional `$errorMessage` that is replaced with the original error mes
 
 If the `$nodeName` does not exist, throws a `Lucy\Exception\ConfigurationException`.
 
-`Lucy::cannotBeEmpty(string $nodeName, string $errorMessage = null)`
+#### `Lucy::cannotBeEmpty(string $nodeName, string $errorMessage = null)`
 
 Validates that a entry under `$nodeName` cannot be empty. It uses a simple `empty()` PHP
 function. 
@@ -226,12 +226,12 @@ If the `$nodeName` does not exist, throws a `Lucy\Exception\ConfigurationExcepti
 
 Accepts an optional `$errorMessage` that is replaced with the original error message for easier debugging.
 
-`Lucy::cannotBeEmptyIfExists(string $nodeName, string $errorMessage = null)`
+#### `Lucy::cannotBeEmptyIfExists(string $nodeName, string $errorMessage = null)`
 
 Does the same thing as `cannotBeEmpty` but does not throw an exception if the `$nodeName` does
 not exist.
 
-`Lucy::isString(string $nodeName, string $errorMessage = null)`
+#### `Lucy::isString(string $nodeName, string $errorMessage = null)`
 
 Validates that a entry under `$nodeName` is a string. A string is considered a string
 even if it is empty ''.
@@ -240,12 +240,12 @@ If the `$nodeName` does not exist, throws a `Lucy\Exception\ConfigurationExcepti
 
 Accepts an optional `$errorMessage` that is replaced with the original error message for easier debugging.
 
-`Lucy::isStringIfExists(string $nodeName, string $errorMessage = null)`
+#### `Lucy::isStringIfExists(string $nodeName, string $errorMessage = null)`
 
 Does the same thing as `isString` but it does not throw an exception if `$nodeName` does
 not exist.
 
-`Lucy::isNumeric(string $nodeName, string $errorMessage = null)`
+#### `Lucy::isNumeric(string $nodeName, string $errorMessage = null)`
 
 Validates that a entry under `$nodeName` a numeric expression. Both '7' and 7 are considered
 numeric. Under the hood, it uses the `is_numeric` PHP function.
@@ -254,12 +254,12 @@ If the `$nodeName` does not exist, throws a `Lucy\Exception\ConfigurationExcepti
 
 Accepts an optional `$errorMessage` that is replaced with the original error message for easier debugging.
 
-`Lucy::isNumericIfExists(string $nodeName, string $errorMessage = null)`
+#### `Lucy::isNumericIfExists(string $nodeName, string $errorMessage = null)`
 
 Does the same thing as `isNumeric` but it does not throw an exception if `$nodeName` 
 does not exist.
 
-`Lucy::isArray(string $nodeName, string $errorMessage = null)`
+#### `Lucy::isArray(string $nodeName, string $errorMessage = null)`
 
 Validates that an entry under `$nodeName` is an array.
 
@@ -267,11 +267,11 @@ If the `$nodeName` does not exist, throws a `Lucy\Exception\ConfigurationExcepti
 
 Accepts an optional `$errorMessage` that is replaced with the original error message for easier debugging.
 
-`Lucy::isArrayIfExists(string $nodeName, string $errorMessage = null)`
+#### `Lucy::isArrayIfExists(string $nodeName, string $errorMessage = null)`
 
 Does the sam thing as `isArray` but does not throw an exception.
 
-`Lucy::isBoolean(string $nodeName, string $errorMessage = null)`
+#### `Lucy::isBoolean(string $nodeName, string $errorMessage = null)`
 
 Validates that the value under `$nodeName` is a boolean. Only `true` or `false` values
 are considered as be a valid boolean.
@@ -280,12 +280,12 @@ If the `$nodeName` does not exist, throws a `Lucy\Exception\ConfigurationExcepti
 
 Accepts an optional `$errorMessage` that is replaced with the original error message for easier debugging.
 
-`Lucy::isBooleanIfExists(string $nodeName, string $errorMessage = null)`
+#### `Lucy::isBooleanIfExists(string $nodeName, string $errorMessage = null)`
 
 Does the same thing as `isBoolean` but does not throw an exception if `$nodeName` does
 not exist.
 
-`Lucy::isAssociativeStringArray(string $nodeName, string $errorMessage = null)`
+#### `Lucy::isAssociativeStringArray(string $nodeName, string $errorMessage = null)`
 
 Validates that all keys in a hashmap are strings. If any of the keys are not strings, it throws
 a `Lucy\Exception\ConfigurationException`.
@@ -294,7 +294,7 @@ If the `$nodeName` does not exist, throws a `Lucy\Exception\ConfigurationExcepti
 
 Accepts an optional `$errorMessage` that is replaced with the original error message for easier debugging.
 
-`Lucy::isEnum(string $nodeName, array $values, string $errorMessage = null)`
+#### `Lucy::isEnum(string $nodeName, array $values, string $errorMessage = null)`
 
 Validates that values in the configuration contains at least one value from `$values`.
 
