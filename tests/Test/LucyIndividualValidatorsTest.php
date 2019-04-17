@@ -494,4 +494,22 @@ class LucyIndividualValidatorsTest extends TestCase
 
         static::assertTrue($enteredException);
     }
+
+    public function testClosureValidator()
+    {
+        $lucy = new Lucy('configuration', $this->deepArray);
+
+        $closureEntered = false;
+        $that = $lucy;
+        $lucy->closureValidator('configuration', function(string $name, Lucy $node) use(&$closureEntered, $that) {
+            $closureEntered = true;
+            static::assertEquals('configuration', $name);
+
+            static::assertEquals($that, $node);
+
+            static::assertTrue($that == $node);
+        });
+
+        static::assertTrue($closureEntered);
+    }
 }
