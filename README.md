@@ -29,11 +29,8 @@ component and *Lucy*, but they are on their way. I hope you like it.
 
 ## 4. Setting up tests
 
-There are no production dependencies but there are development dependencies. After you clone this repo,
-
-`git@github.com:MarioLegenda/lucy.git`
-
-run `composer install`. The tests are in the `/tests` directory
+There are no production dependencies but there are development dependencies. After you clone this repo with 
+`git@github.com:MarioLegenda/lucy.git`, run `composer install`. The tests are in the `/tests` directory
 
 
 
