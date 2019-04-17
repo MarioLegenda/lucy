@@ -197,7 +197,7 @@ class Lucy implements \IteratorAggregate, \Countable
      * Invokes a custom anonymous function on the given node. It only works on the
      * currently working node
      */
-    public function closureValidator(string $nodeName, \Closure $closure) : Lucy
+    public function applyClosure(string $nodeName, \Closure $closure) : Lucy
     {
         if ($this->conditionalIgnore === false) {
             $closure->__invoke($nodeName, $this);
@@ -213,13 +213,13 @@ class Lucy implements \IteratorAggregate, \Countable
      *
      * Applies a callback to all child nodes
      */
-    public function applyToSubElementsOf(array $childNodes, \Closure $closure) : Lucy
+    public function applyToSubElements(array $childNodes, \Closure $closure) : Lucy
     {
         if ($this->conditionalIgnore === false) {
             foreach ($childNodes as $childNode) {
                 $this->internalKeyExists($childNode, $this->workingNode, $this->parentNode);
 
-                $closure->__invoke($childNode, new Lucy($childNode, $this->workingNode[$childNode]));
+                $closure->__invoke($childNode, $this->workingNode[$childNode]);
             }
         }
 
@@ -229,7 +229,6 @@ class Lucy implements \IteratorAggregate, \Countable
      * @param array $childNodes
      * @param \Closure $closure
      * @return $this
-     * @throws ConfigurationException
      */
     public function applyToSubElementsIfTheyExist(array $childNodes, \Closure $closure) : Lucy
     {
@@ -239,7 +238,7 @@ class Lucy implements \IteratorAggregate, \Countable
                     continue;
                 }
 
-                $closure->__invoke($childNode, new Lucy($childNode, $this->workingNode[$childNode]));
+                $closure->__invoke($childNode, $this->workingNode[$childNode]);
             }
         }
 

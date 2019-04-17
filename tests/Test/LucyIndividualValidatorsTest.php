@@ -543,7 +543,7 @@ class LucyIndividualValidatorsTest extends TestCase
 
         $closureEntered = false;
         $that = $lucy;
-        $lucy->closureValidator('configuration', function(string $name, Lucy $node) use(&$closureEntered, $that) {
+        $lucy->applyClosure('configuration', function(string $name, Lucy $node) use(&$closureEntered, $that) {
             $closureEntered = true;
             static::assertEquals('configuration', $name);
 
@@ -553,5 +553,66 @@ class LucyIndividualValidatorsTest extends TestCase
         });
 
         static::assertTrue($closureEntered);
+    }
+
+    public function testApplyToSubElementsOf()
+    {
+        $configuration = [
+            'configuration' => [
+                'childNode1' => 1,
+                'childNode2' => 2,
+                'childNode3' => 3,
+                'childNode4' => 4,
+            ]
+        ];
+
+        $lucy = new Lucy('configuration', $configuration);
+
+        $enteredCount = 0;
+        $lucy
+            ->stepInto('configuration')
+            ->applyToSubElements([
+                'childNode1',
+                'childNode2',
+                'childNode3',
+                'childNode4',
+        ], function(string $name, int $value) use (&$enteredCount) {
+            $enteredCount++;
+
+            static::assertEquals('childNode'.$enteredCount, $name);
+            static::assertEquals($enteredCount, $value);
+        });
+
+        static::assertEquals(4, $enteredCount);
+    }
+
+    public function testApplyToSubElementsOfIfTheyExist()
+    {
+        $configuration = [
+            'configuration' => [
+                'not_exists1' => 1,
+                'not_exists2' => 2,
+                'childNode3' => 3,
+                'childNode4' => 4,
+            ]
+        ];
+
+        $lucy = new Lucy('configuration', $configuration);
+
+        $enteredCount = 0;
+        $lucy
+            ->stepInto('configuration')
+            ->applyToSubElementsIfTheyExist([
+                'childNode1',
+                'childNode2',
+                'childNode3',
+                'childNode4',
+            ], function(string $name, int $value) use (&$enteredCount) {
+                $enteredCount++;
+
+                static::assertEquals('childNode'.$value, $name);
+            });
+
+        static::assertEquals(2, $enteredCount);
     }
 }
