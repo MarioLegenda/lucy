@@ -1,7 +1,7 @@
 ## Lucy
 *Lightweight PHP config parser with zero dependencies*
 
-*Lucy* requires PHP version `>=7.0 <=7.3`. Create on PHP 7.3.4
+*Lucy* requires PHP version `>=7.0 <=7.3`. Created on PHP `7.3.4`
 
 ## Content
 
