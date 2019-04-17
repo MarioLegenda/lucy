@@ -564,6 +564,8 @@ class Lucy implements \IteratorAggregate, \Countable
                 }
             }
 
+            if ($errorMessage) throw new ConfigurationException($errorMessage);
+
             $message = sprintf(
                 'Invalid enum. At least one value in array [%s] has to exist in node \'%s\'',
                 implode(', ', $values),
