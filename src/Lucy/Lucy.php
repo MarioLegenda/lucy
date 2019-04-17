@@ -408,18 +408,12 @@ class Lucy implements \IteratorAggregate, \Countable
      */
     public function isNumericIfExists(string $nodeName, string $errorMessage = null): Lucy
     {
-        $this->internalKeyExists($nodeName, $this->workingNode);
-
-        if (!is_numeric($this->workingNode[$nodeName])) {
-            if ($errorMessage) throw new ConfigurationException($errorMessage);
-
-            $message = sprintf(
-                '\'%s\' has to be a numeric value',
-                $nodeName
-            );
-
-            throw new ConfigurationException($message);
-        }
+        $this->validator->isNumericIfExists()->validate(
+            $nodeName,
+            $this->workingNode,
+            $this->parentNode,
+            $errorMessage
+        );
 
         return $this;
     }

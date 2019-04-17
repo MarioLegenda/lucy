@@ -6,6 +6,7 @@ namespace Lucy\Validator;
 use Lucy\Validator\Implementation\CannotBeEmpty;
 use Lucy\Validator\Implementation\CannotBeEmptyIfExists;
 use Lucy\Validator\Implementation\IsNumeric;
+use Lucy\Validator\Implementation\IsNumericIfExists;
 use Lucy\Validator\Implementation\IsString;
 use Lucy\Validator\Implementation\IsStringIfExists;
 use Lucy\Validator\Implementation\KeyHasToExist;
@@ -38,6 +39,7 @@ final class Factory
         static::$validators[IsString::class] = function() { return new IsString(); };
         static::$validators[IsStringIfExists::class] = function() { return new IsStringIfExists(); };
         static::$validators[IsNumeric::class] = function() { return new IsNumeric(); };
+        static::$validators[IsNumericIfExists::class] = function() { return new IsNumericIfExists(); };
     }
     /**
      * @param string $name
