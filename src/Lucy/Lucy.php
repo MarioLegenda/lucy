@@ -470,18 +470,12 @@ class Lucy implements \IteratorAggregate, \Countable
     public function isBoolean(string $nodeName, string $errorMessage = null) : Lucy
     {
         if ($this->conditionalIgnore === false) {
-            $this->internalKeyExists($nodeName, $this->workingNode);
-
-            if (!is_bool($this->workingNode[$nodeName])) {
-                if ($errorMessage) throw new ConfigurationException($errorMessage);
-
-                $message = sprintf(
-                    '\'%s\' has to be a boolean',
-                    $nodeName
-                );
-
-                throw new ConfigurationException($message);
-            }
+            $this->validator->isBoolean()->validate(
+                $nodeName,
+                $this->workingNode,
+                $this->parentNode,
+                $errorMessage
+            );
         }
 
         return $this;
