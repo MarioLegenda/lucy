@@ -31,6 +31,14 @@ class CannotBeEmptyIfExists implements ValidatorInterface
                     $name
                 );
 
+                if ($parent instanceof Lucy) {
+                    $message = sprintf(
+                        '\'%s\' cannot be empty if exists for parent node \'%s\'',
+                        $name,
+                        $parent->getNodeName()
+                    );
+                }
+
                 throw new ConfigurationException($message);
             }
         }

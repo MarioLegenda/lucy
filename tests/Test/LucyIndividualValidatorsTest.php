@@ -110,4 +110,37 @@ class LucyIndividualValidatorsTest extends TestCase
 
         static::assertTrue($enteredException);
     }
+
+    public function testIsString()
+    {
+        $configuration = [
+            'isString' => 'string'
+        ];
+
+        $lucy = new Lucy('isString', $configuration);
+
+        $enteredException = false;
+        try {
+            $lucy->isString('isString');
+        } catch (ConfigurationException $e) {
+            $enteredException = true;
+        }
+
+        static::assertFalse($enteredException);
+
+        $configuration = [
+            'notString' => null
+        ];
+
+        $lucy = new Lucy('notString', $configuration);
+
+        $enteredException = false;
+        try {
+            $lucy->isString('notString');
+        } catch (ConfigurationException $e) {
+            $enteredException = true;
+        }
+
+        static::assertTrue($enteredException);
+    }
 }

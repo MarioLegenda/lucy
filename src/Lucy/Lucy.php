@@ -343,18 +343,12 @@ class Lucy implements \IteratorAggregate, \Countable
     public function isString(string $nodeName, string $errorMessage = null) : Lucy
     {
         if ($this->conditionalIgnore === false) {
-            $this->internalKeyExists($nodeName, $this->workingNode);
-
-            if (!is_string($this->workingNode[$nodeName])) {
-                if ($errorMessage) throw new ConfigurationException($errorMessage);
-
-                $message = sprintf(
-                    '\'%s\' has to be a string',
-                    $errorMessage
-                );
-
-                throw new ConfigurationException($message);
-            }
+            $this->validator->isString()->validate(
+                $nodeName,
+                $this->workingNode,
+                $this->parentNode,
+                $errorMessage
+            );
         }
 
         return $this;
