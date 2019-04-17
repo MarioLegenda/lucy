@@ -364,18 +364,12 @@ class Lucy implements \IteratorAggregate, \Countable
      */
     public function isStringIfExists(string $nodeName, string $errorMessage = null) : Lucy
     {
-        if (array_key_exists($nodeName, $this->workingNode)) {
-            if (!is_string($this->workingNode[$nodeName])) {
-                if ($errorMessage) throw new ConfigurationException($errorMessage);
-
-                $message = sprintf(
-                    'If \'%s\' exists, it has to be a string',
-                    $nodeName
-                );
-
-                throw new ConfigurationException($message);
-            }
-        }
+        $this->validator->isStringIfExists()->validate(
+            $nodeName,
+            $this->workingNode,
+            $this->parentNode,
+            $errorMessage
+        );
 
         return $this;
     }
