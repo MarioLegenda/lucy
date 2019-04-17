@@ -127,7 +127,7 @@ Those validators accept a closure (anonymous function) and pass the node name an
 object.
 
 ```
-$lucy->applyCallback(['configuration'], function($nodeName, Lucy $lucy) {
+$lucy->applyCallback('configuration', function($nodeName, Lucy $lucy) {
     // $nodeName in this example is 'configuration' and
     // $lucy object can validate 'configuration' entry
     
@@ -141,7 +141,7 @@ with `applyToSubElements`.
 ```
 $lucy
     ->stepInto('configuration')
-    ->applyToSubElementsOf('configuration, function($nodeName, Lucy $lucy) {
+    ->applyToSubElementsOf(['database', 'external_service'], function($nodeName, Lucy $lucy) {
         // this method will be called twice, once for once for 'database' entry
         // and once for 'external_service' entry. Every time it is called,
         // you will get a Lucy object for those entries, so you can to something
